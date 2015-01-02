@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	          http://www.springframework.org/schema/beans/spring-beans.xsd
+	        http://www.springframework.org/schema/integration 
+	           http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/jms
+			  http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
+
+	<int:channel id="input" />
+
+	<int-jms:outbound-channel-adapter
+		destination="destinationQueue" channel="input" />
+
+	<bean id="destinationQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="${destinationQueue}" />
+	</bean>
+
+	<bean id="connectionFactory"
+		class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory">
+			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL" value="${protocol:tcp}://${activemqHost:localhost}:${activemqPort:61616}" />
+			</bean>
+		</property>
+		<property name="sessionCacheSize" value="10" />
+		<property name="cacheProducers" value="false" />
+	</bean>
+</beans>
